@@ -38,19 +38,26 @@ export const refreshToken = (): Promise<TRefreshResponse> =>
 export const fetchWithRefresh = async <T>(
   url: RequestInfo,
   options: RequestInit
-) => {
+): Promise<T> => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes timeout
+
   try {
-    const res = await fetch(url, options);
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(timeoutId);
     return await checkResponse<T>(res);
   } catch (err) {
+    clearTimeout(timeoutId);
     if ((err as { message: string }).message === 'jwt expired') {
       const refreshData = await refreshToken();
       if (options.headers) {
         (options.headers as { [key: string]: string }).authorization =
           refreshData.accessToken;
       }
-      const res = await fetch(url, options);
+      const res = await fetch(url, { ...options, signal: controller.signal });
       return await checkResponse<T>(res);
+    } else if ((err as Error).name === 'AbortError') {
+      return Promise.reject(new Error('Request timeout after 2 minutes'));
     } else {
       return Promise.reject(err);
     }
