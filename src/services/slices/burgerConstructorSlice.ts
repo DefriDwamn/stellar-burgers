@@ -1,4 +1,9 @@
-import { nanoid, PayloadAction, createSlice } from '@reduxjs/toolkit';
+import {
+  nanoid,
+  PayloadAction,
+  createSlice,
+  createSelector
+} from '@reduxjs/toolkit';
 import { TIngredient, TConstructorIngredient } from '@utils-types';
 // Определяем интерфейс состояния конструктора бургера
 interface IBurgerConstructorState {
@@ -16,7 +21,19 @@ export const burgerConstructorSlice = createSlice({
   name: 'burgerConstructor',
   initialState,
   selectors: {
-    getConstructorState: (state) => state
+    getConstructorState: (state) => state,
+    getIngredientCounters: createSelector(
+      (state) => state,
+      (state) => {
+        const counters: { [key: string]: number } = {};
+        state.ingredients.forEach((ingredient: TConstructorIngredient) => {
+          if (!counters[ingredient._id]) counters[ingredient._id] = 0;
+          counters[ingredient._id]++;
+        });
+        if (state.bun) counters[state.bun._id] = 2;
+        return counters;
+      }
+    )
   },
   reducers: {
     // Редьюсеры для изменения состояния
@@ -68,5 +85,6 @@ export const {
   clearConstructor
 } = burgerConstructorSlice.actions;
 
-// Экспортируем селектор для получения состояния конструктора
-export const { getConstructorState } = burgerConstructorSlice.selectors;
+// Экспортируем селекторы
+export const { getConstructorState, getIngredientCounters } =
+  burgerConstructorSlice.selectors;

@@ -1,4 +1,8 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import {
+  createSlice,
+  createAsyncThunk,
+  createSelector
+} from '@reduxjs/toolkit';
 import { getIngredientsApi } from '../../utils/burger-api';
 import { TIngredient } from '../../utils/types';
 
@@ -51,16 +55,18 @@ const selectIsLoading = (state: { ingredients: TIngredientsSliceState }) =>
 const selectError = (state: { ingredients: TIngredientsSliceState }) =>
   state.ingredients.error;
 
-const selectByType =
-  (type: string) => (state: { ingredients: TIngredientsSliceState }) =>
-    state.ingredients.ingredients.filter(
-      (ingredient) => ingredient.type === type
-    );
+// Мемоизированные селекторы
+export const selectBuns = createSelector(selectIngredients, (ingredients) =>
+  ingredients.filter((ingredient) => ingredient.type === 'bun')
+);
 
-// Экспортируем селекторы
-export const selectBuns = selectByType('bun');
-export const selectSauces = selectByType('sauce');
-export const selectMains = selectByType('main');
+export const selectSauces = createSelector(selectIngredients, (ingredients) =>
+  ingredients.filter((ingredient) => ingredient.type === 'sauce')
+);
+
+export const selectMains = createSelector(selectIngredients, (ingredients) =>
+  ingredients.filter((ingredient) => ingredient.type === 'main')
+);
 
 export { selectIngredients, selectIsLoading, selectError };
 

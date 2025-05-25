@@ -11,7 +11,7 @@ describe('rootReducer', () => {
   test('возвращает корректное начальное состояние при неизвестном экшене', () => {
     const unknownAction = { type: 'UNKNOWN_ACTION' };
     const initialState = store.getState();
-    
+
     const state = rootReducer(undefined, unknownAction);
 
     expect(state).toEqual(initialState); // Проверка на совпадение с начальным состоянием
