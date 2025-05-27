@@ -6,6 +6,13 @@ const selectorButtonCloseModal = '[data-cy="modal-close"]';
 const selectorOverlayModal = '[data-cy="modalOverlay"]';
 const ingredientBun = 'Флюоресцентная булка R2-D3';
 
+const NUTRITION_LABELS = {
+  CALORIES: 'Калории',
+  PROTEINS: 'Белки',
+  FAT: 'Жиры',
+  CARBOHYDRATES: 'Углеводы'
+};
+
 describe('Burger Constructor Page Tests', () => {
   beforeEach(() => {
     cy.fixture('ingredients.json').as('ingredientsData');
@@ -55,24 +62,44 @@ describe('Burger Constructor Page Tests', () => {
     );
   });
 
-  it('should open ingredient modal on click and close it via close button or overlay', () => {
+  it('should open ingredient modal with correct data and close it via close button or overlay', function () {
     cy.wait('@getIngredients');
-
-    // Open modal
-    cy.contains(ingredientBun).click();
-    cy.get(selectorModal).should('be.visible');
-
-    // Close via close button
-    cy.get(selectorButtonCloseModal).click();
-    cy.get(selectorModal).should('not.exist');
-
-    // Open modal again
-    cy.contains(ingredientBun).click();
-    cy.get(selectorModal).should('exist');
-
-    // Close via overlay
-    cy.get(selectorOverlayModal).click({ force: true });
-    cy.get(selectorModal).should('not.exist');
+  
+    // Get data from fixture
+    cy.get('@ingredientsData').then((ingredientsData: any) => {
+      const testIngredient = ingredientsData.data.find(
+        (item: { name: string }) => item.name === ingredientBun
+      );
+  
+      // Open modal by click
+      cy.contains(ingredientBun).click();
+      cy.get(selectorModal).should('be.visible');
+  
+      // Check if modal displays correct data
+      cy.get(selectorModal).within(() => {
+        cy.contains(testIngredient.name);
+        cy.contains(NUTRITION_LABELS.CALORIES).should('be.visible');
+        cy.contains(testIngredient.calories.toString()).should('be.visible');
+        cy.contains(NUTRITION_LABELS.PROTEINS).should('be.visible');
+        cy.contains(testIngredient.proteins.toString()).should('be.visible');
+        cy.contains(NUTRITION_LABELS.FAT).should('be.visible');
+        cy.contains(testIngredient.fat.toString()).should('be.visible');
+        cy.contains(NUTRITION_LABELS.CARBOHYDRATES).should('be.visible');
+        cy.contains(testIngredient.carbohydrates.toString()).should('be.visible');
+      });
+  
+      // Close via button
+      cy.get(selectorButtonCloseModal).click();
+      cy.get(selectorModal).should('not.exist');
+  
+      // Open modal again
+      cy.contains(ingredientBun).click();
+      cy.get(selectorModal).should('be.visible');
+  
+      // Close via overlay
+      cy.get(selectorOverlayModal).click({ force: true });
+      cy.get(selectorModal).should('not.exist');
+    });
   });
 
   it('should create order and clear constructor after successful order placement', () => {
@@ -118,11 +145,11 @@ describe('Burger Constructor Page Tests', () => {
     cy.get(selectorConstructorModule)
       .children()
       .first()
-      .should('contain.text', 'Выберите булки');
+      .should('contain.text', 'Выберите bun');
     cy.get(selectorConstructorModule)
       .children()
       .first()
       .next()
-      .should('contain.text', 'Выберите начинку');
+      .should('contain.text', 'Выберите filling');
   });
 });
