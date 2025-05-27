@@ -5,18 +5,25 @@ import {
   createSelector
 } from '@reduxjs/toolkit';
 import { TIngredient, TConstructorIngredient } from '@utils-types';
-// Определяем интерфейс состояния конструктора бургера
+
+// Типы
 interface IBurgerConstructorState {
   bun: TConstructorIngredient | null;
   ingredients: TConstructorIngredient[];
 }
 
-// Начальное состояние конструктора бургера
+// Константы
+const INGREDIENT_TYPES = {
+  BUN: 'bun'
+} as const;
+
+// Начальное состояние
 export const initialState: IBurgerConstructorState = {
   bun: null,
   ingredients: []
 };
 
+// Создание slice
 export const burgerConstructorSlice = createSlice({
   name: 'burgerConstructor',
   initialState,
@@ -25,25 +32,29 @@ export const burgerConstructorSlice = createSlice({
     getIngredientCounters: createSelector(
       (state) => state,
       (state) => {
-        const counters: { [key: string]: number } = {};
+        const counters: Record<string, number> = {};
+
+        // Подсчет обычных ингредиентов
         state.ingredients.forEach((ingredient: TConstructorIngredient) => {
-          if (!counters[ingredient._id]) counters[ingredient._id] = 0;
-          counters[ingredient._id]++;
+          counters[ingredient._id] = (counters[ingredient._id] || 0) + 1;
         });
-        if (state.bun) counters[state.bun._id] = 2;
+
+        // Добавление булочки (считается за 2)
+        if (state.bun) {
+          counters[state.bun._id] = 2;
+        }
+
         return counters;
       }
     )
   },
   reducers: {
-    // Редьюсеры для изменения состояния
     addIngredientToConstructor: {
       prepare: (item: TIngredient) => ({
         payload: { ...item, id: nanoid() }
       }),
-
       reducer: (state, action: PayloadAction<TConstructorIngredient>) => {
-        if (action.payload.type === 'bun') {
+        if (action.payload.type === INGREDIENT_TYPES.BUN) {
           state.bun = action.payload;
         } else {
           state.ingredients.push(action.payload);
@@ -56,7 +67,7 @@ export const burgerConstructorSlice = createSlice({
       );
 
       if (ingredientIndex >= 0) {
-        state.ingredients.splice(ingredientIndex, 1); // Удаляем элемент по индексу
+        state.ingredients.splice(ingredientIndex, 1);
       }
     },
     moveIngredientInConstructor: (
@@ -66,18 +77,18 @@ export const burgerConstructorSlice = createSlice({
       const { from, to } = action.payload;
 
       if (from !== to) {
-        const [movedIngredient] = state.ingredients.splice(from, 1); // Удаляем элемент из original массива
-        state.ingredients.splice(to, 0, movedIngredient); // Вставляем его на новое место
+        const [movedIngredient] = state.ingredients.splice(from, 1);
+        state.ingredients.splice(to, 0, movedIngredient);
       }
     },
     clearConstructor: (state) => {
-      // Очистка конструктора
       state.ingredients = [];
       state.bun = null;
     }
   }
 });
 
+// Экспорт действий
 export const {
   addIngredientToConstructor,
   deleteIngredientFromConstructor,
@@ -85,6 +96,8 @@ export const {
   clearConstructor
 } = burgerConstructorSlice.actions;
 
-// Экспортируем селекторы
+// Экспорт селекторов
 export const { getConstructorState, getIngredientCounters } =
   burgerConstructorSlice.selectors;
+
+export default burgerConstructorSlice.reducer;
