@@ -1,12 +1,12 @@
 import {
-  ordersSlice,
-  fetchOrders,
-  clearOrders,
+  orderSlice,
+  fetchOrder,
+  clearOrder,
   initialState
-} from './ordersHistorySlice';
+} from './orderSlice';
 import { expect, test } from '@jest/globals';
 
-describe('Orders History Slice', () => {
+describe('Order Slice', () => {
   const mockOrder = {
     _id: '671239b2d829be001c776eb8',
     number: 56854,
@@ -18,8 +18,8 @@ describe('Orders History Slice', () => {
   };
 
   test('sets loading state on pending', () => {
-    const action = { type: fetchOrders.pending.type };
-    const state = ordersSlice.reducer(initialState, action);
+    const action = { type: fetchOrder.pending.type };
+    const state = orderSlice.reducer(initialState, action);
     expect(state.loading).toBe(true);
     expect(state.orderClaim).toBe(true);
     expect(state.orderError).toBeNull();
@@ -27,10 +27,10 @@ describe('Orders History Slice', () => {
 
   test('updates order on success', () => {
     const action = {
-      type: fetchOrders.fulfilled.type,
+      type: fetchOrder.fulfilled.type,
       payload: { order: mockOrder }
     };
-    const state = ordersSlice.reducer(initialState, action);
+    const state = orderSlice.reducer(initialState, action);
     expect(state.loading).toBe(false);
     expect(state.orderDetails).toEqual(mockOrder);
     expect(state.orderClaim).toBe(false);
@@ -38,18 +38,18 @@ describe('Orders History Slice', () => {
 
   test('handles error state', () => {
     const action = {
-      type: fetchOrders.rejected.type,
+      type: fetchOrder.rejected.type,
       error: { message: 'Ошибка создания заказа' }
     };
-    const state = ordersSlice.reducer(initialState, action);
+    const state = orderSlice.reducer(initialState, action);
     expect(state.loading).toBe(false);
     expect(state.orderError).toBe('Ошибка создания заказа');
   });
 
   test('clears order data', () => {
     const stateWithOrder = { ...initialState, orderDetails: mockOrder };
-    const action = clearOrders();
-    const state = ordersSlice.reducer(stateWithOrder, action);
+    const action = clearOrder();
+    const state = orderSlice.reducer(stateWithOrder, action);
     expect(state.orderDetails).toBeNull();
   });
-});
+}); 

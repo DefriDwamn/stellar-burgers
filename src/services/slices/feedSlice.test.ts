@@ -1,15 +1,15 @@
 import { expect, test } from '@jest/globals';
 import { feedSlice, fetchFeeds, initialState } from './feedSlice';
 
-describe('feedSlice', () => {
-  test('fetchFeeds.pending sets isLoading to true', () => {
+describe('Feed Slice', () => {
+  test('sets loading state on pending', () => {
     const action = { type: fetchFeeds.pending.type };
     const state = feedSlice.reducer(initialState, action);
     expect(state.isLoading).toBe(true);
     expect(state.error).toBe(null);
   });
 
-  test('fetchFeeds.fulfilled sets feed and isLoading to false', () => {
+  test('updates feed data on success', () => {
     const feedData = {
       total: 100,
       totalToday: 10,
@@ -23,7 +23,7 @@ describe('feedSlice', () => {
     expect(state.isLoading).toBe(false);
   });
 
-  test('fetchFeeds.rejected sets error and isLoading to false', () => {
+  test('handles error state', () => {
     const errorMessage = 'Error message';
     const action = {
       type: fetchFeeds.rejected.type,

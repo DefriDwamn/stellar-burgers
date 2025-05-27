@@ -5,8 +5,8 @@ import {
   initialState
 } from './activeOrdersSlice';
 
-describe('submittedOrdersSlice', () => {
-  test('fetchSubmitOrders.pending устанавливает fetchingStatus в true', () => {
+describe('Active Orders Slice', () => {
+  test('sets loading state on pending', () => {
     const action = { type: fetchSubmitOrders.pending.type };
     const state = submittedOrdersSlice.reducer(initialState, action);
     expect(state.fetchingStatus).toBe(true);
@@ -14,7 +14,7 @@ describe('submittedOrdersSlice', () => {
     expect(state.error).toBe(null);
   });
 
-  test('fetchSubmitOrders.fulfilled устанавливает заказы и fetchingStatus в false', () => {
+  test('updates orders on success', () => {
     const ordersData = [{ id: '1', name: 'Order 1' }];
     const action = {
       type: fetchSubmitOrders.fulfilled.type,
@@ -25,7 +25,7 @@ describe('submittedOrdersSlice', () => {
     expect(state.fetchingStatus).toBe(false);
   });
 
-  test('fetchSubmitOrders.rejected устанавливает ошибку и fetchingStatus в false', () => {
+  test('handles error state', () => {
     const errorMessage = 'Error message';
     const action = {
       type: fetchSubmitOrders.rejected.type,
