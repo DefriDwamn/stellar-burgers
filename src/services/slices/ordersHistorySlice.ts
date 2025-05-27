@@ -26,7 +26,7 @@ export const fetchOrders = createAsyncThunk(
       return response;
     } catch (error) {
       return rejectWithValue(
-        (error as Error).message || 'Failed to create order'
+        (error as Error).message || 'Ошибка создания заказа'
       );
     }
   }
@@ -39,7 +39,7 @@ export const retrieveOrderByNumber = createAsyncThunk(
       return await getOrderByNumberApi(data);
     } catch (error) {
       return rejectWithValue(
-        (error as Error).message || 'Failed to retrieve order'
+        (error as Error).message || 'Ошибка получения заказа'
       );
     }
   }
@@ -73,7 +73,7 @@ export const ordersSlice = createSlice({
         state.orderClaim = false;
         state.loading = false;
         state.orderError =
-          (action.payload as string) || 'Failed to create order';
+          (action.payload as string) || 'Ошибка создания заказа';
       })
       .addCase(retrieveOrderByNumber.pending, (state) => {
         state.orderClaim = true;
@@ -90,7 +90,7 @@ export const ordersSlice = createSlice({
         state.orderClaim = false;
         state.loading = false;
         state.orderError =
-          (action.payload as string) || 'Failed to retrieve order';
+          (action.payload as string) || 'Ошибка получения заказа';
       });
   },
   selectors: {

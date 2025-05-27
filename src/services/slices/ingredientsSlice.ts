@@ -66,8 +66,7 @@ export const ingredientsSlice = createSlice({
       )
       .addCase(fetchIngredients.rejected, (state, action) => {
         state.isLoading = false;
-        state.error =
-          (action.payload as string) || ERROR_MESSAGES.DEFAULT_ERROR;
+        state.error = (action.payload as string) || 'Ошибка';
       });
   }
 });
