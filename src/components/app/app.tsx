@@ -18,6 +18,74 @@ import { fetchIngredients } from '../../services/slices/ingredientsSlice';
 import { AppHeader, Modal, OrderInfo, IngredientDetails } from '@components';
 import { useDispatch } from '../../services/store';
 import { verifyUser } from '../../services/slices/profileUserSlice';
+import { FC } from 'react';
+
+type ModalRoute = {
+  path: string;
+  title: string;
+  redirectPath: string;
+  component: FC;
+};
+
+type ProtectedRouteConfig = {
+  path: string;
+  element: FC;
+  anonymous?: boolean;
+};
+
+// Конфигурация модальных окон
+const MODAL_ROUTES: ModalRoute[] = [
+  {
+    path: '/feed/:number',
+    title: 'Детали заказа',
+    redirectPath: '/feed',
+    component: OrderInfo
+  },
+  {
+    path: '/ingredients/:id',
+    title: 'Детали ингредиента',
+    redirectPath: '/',
+    component: IngredientDetails
+  },
+  {
+    path: '/profile/orders/:number',
+    title: 'Детали заказа',
+    redirectPath: '/profile/orders',
+    component: OrderInfo
+  }
+];
+
+// Конфигурация защищенных маршрутов
+const PROTECTED_ROUTES: ProtectedRouteConfig[] = [
+  {
+    path: '/login',
+    element: Login,
+    anonymous: true
+  },
+  {
+    path: '/forgot-password',
+    element: ForgotPassword,
+    anonymous: true
+  },
+  {
+    path: '/register',
+    element: Register,
+    anonymous: true
+  },
+  {
+    path: '/reset-password',
+    element: ResetPassword,
+    anonymous: true
+  },
+  {
+    path: '/profile',
+    element: Profile
+  },
+  {
+    path: '/profile/orders',
+    element: ProfileOrders
+  }
+];
 
 const App = () => {
   const dispatch = useDispatch();
@@ -30,7 +98,6 @@ const App = () => {
     dispatch(verifyUser());
   }, [dispatch]);
 
-  // Функция для создания маршрутов модальных окон
   const renderModalRoute = (
     path: string,
     title: string,
@@ -53,72 +120,27 @@ const App = () => {
       <Routes location={backgroundPosition || location}>
         <Route path='/' element={<ConstructorPage />} />
         <Route path='/feed' element={<Feed />} />
-        <Route
-          path='/login'
-          element={
-            <ProtectedRoute anonymous>
-              <Login />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path='/forgot-password'
-          element={
-            <ProtectedRoute anonymous>
-              <ForgotPassword />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path='/register'
-          element={
-            <ProtectedRoute anonymous>
-              <Register />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path='/reset-password'
-          element={
-            <ProtectedRoute anonymous>
-              <ResetPassword />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path='/profile'
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path='/profile/orders'
-          element={
-            <ProtectedRoute>
-              <ProfileOrders />
-            </ProtectedRoute>
-          }
-        />
 
-        {renderModalRoute(
-          '/feed/:number',
-          'Детали заказа',
-          () => navigate('/feed'),
-          <OrderInfo />
-        )}
-        {renderModalRoute(
-          '/ingredients/:id',
-          'Детали ингредиента',
-          () => navigate('/'),
-          <IngredientDetails />
-        )}
-        {renderModalRoute(
-          '/profile/orders/:number',
-          'Детали заказа',
-          () => navigate('/profile/orders'),
-          <OrderInfo />
+        {PROTECTED_ROUTES.map(({ path, element: Element, anonymous }) => (
+          <Route
+            key={path}
+            path={path}
+            element={
+              <ProtectedRoute anonymous={anonymous}>
+                <Element />
+              </ProtectedRoute>
+            }
+          />
+        ))}
+
+        {MODAL_ROUTES.map(
+          ({ path, title, redirectPath, component: Component }) =>
+            renderModalRoute(
+              path,
+              title,
+              () => navigate(redirectPath),
+              <Component />
+            )
         )}
 
         <Route path='*' element={<NotFound404 />} />
@@ -126,23 +148,14 @@ const App = () => {
 
       {backgroundPosition && (
         <Routes>
-          {renderModalRoute(
-            '/feed/:number',
-            'Детали заказа',
-            () => navigate('/feed'),
-            <OrderInfo />
-          )}
-          {renderModalRoute(
-            '/ingredients/:id',
-            'Детали ингредиента',
-            () => navigate('/'),
-            <IngredientDetails />
-          )}
-          {renderModalRoute(
-            '/profile/orders/:number',
-            'Детали заказа',
-            () => navigate('/profile/orders'),
-            <OrderInfo />
+          {MODAL_ROUTES.map(
+            ({ path, title, redirectPath, component: Component }) =>
+              renderModalRoute(
+                path,
+                title,
+                () => navigate(redirectPath),
+                <Component />
+              )
           )}
         </Routes>
       )}
