@@ -6,7 +6,7 @@ const selectorButtonCloseModal = '[data-cy="modal-close"]';
 const selectorOverlayModal = '[data-cy="modalOverlay"]';
 const ingredientBun = 'Флюоресцентная булка R2-D3';
 
-describe('Тесты для конструктора бургера без перетаскивания', () => {
+describe('Burger Constructor Page Tests', () => {
   beforeEach(() => {
     cy.fixture('ingredients.json').as('ingredientsData');
     cy.intercept('GET', '/api/ingredients', { fixture: 'ingredients.json' }).as(
@@ -27,9 +27,10 @@ describe('Тесты для конструктора бургера без пе�
     cy.clearCookie('accessToken');
   });
 
-  it('Добавление ингредиента в конструктор через кнопку', () => {
+  it('should add bun and filling to constructor when clicking add button', () => {
     cy.wait('@getIngredients');
 
+    // Add bun
     cy.get(selectorIngredientsModule)
       .contains(ingredientBun)
       .parent()
@@ -41,6 +42,7 @@ describe('Тесты для конструктора бургера без пе�
       ingredientBun
     );
 
+    // Add filling
     cy.get(selectorIngredientsModule)
       .contains('Хрустящие минеральные кольца')
       .parent()
@@ -53,22 +55,28 @@ describe('Тесты для конструктора бургера без пе�
     );
   });
 
-  it('Открытие и закрытие модального окна ингредиента', () => {
+  it('should open ingredient modal on click and close it via close button or overlay', () => {
     cy.wait('@getIngredients');
 
+    // Open modal
     cy.contains(ingredientBun).click();
     cy.get(selectorModal).should('be.visible');
 
+    // Close via close button
     cy.get(selectorButtonCloseModal).click();
     cy.get(selectorModal).should('not.exist');
 
+    // Open modal again
     cy.contains(ingredientBun).click();
     cy.get(selectorModal).should('exist');
+
+    // Close via overlay
     cy.get(selectorOverlayModal).click({ force: true });
     cy.get(selectorModal).should('not.exist');
   });
 
-  it('Оформление заказа', () => {
+  it('should create order and clear constructor after successful order placement', () => {
+    // Mock auth endpoints
     cy.intercept('POST', '/api/auth/login', { fixture: 'login.json' }).as(
       'login'
     );
@@ -76,6 +84,7 @@ describe('Тесты для конструктора бургера без пе�
 
     cy.wait('@getIngredients');
 
+    // Add ingredients to constructor
     cy.get(selectorIngredientsModule)
       .contains(ingredientBun)
       .parent()
@@ -87,20 +96,25 @@ describe('Тесты для конструктора бургера без пе�
       .find('button')
       .click({ force: true });
 
+    // Place order
     cy.get(selectorConstructorModule)
       .children()
       .last()
       .find('button')
       .click({ force: true });
 
+    // Verify order creation
     cy.wait('@postOrder').its('response.statusCode').should('eq', 200);
 
+    // Check order modal
     cy.get(selectorModal).should('exist');
     cy.get(selectorModal).should('contain', '12345');
 
+    // Close order modal
     cy.get(selectorButtonCloseModal).click();
     cy.get(selectorModal).should('not.exist');
 
+    // Verify constructor is cleared
     cy.get(selectorConstructorModule)
       .children()
       .first()
