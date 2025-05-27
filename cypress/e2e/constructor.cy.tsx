@@ -5,6 +5,7 @@ const selectorModal = '[data-cy="modal"]';
 const selectorButtonCloseModal = '[data-cy="modal-close"]';
 const selectorOverlayModal = '[data-cy="modalOverlay"]';
 const ingredientBun = 'Флюоресцентная булка R2-D3';
+const ingredientFilling = 'Хрустящие минеральные кольца';
 
 const NUTRITION_LABELS = {
   CALORIES: 'Калории',
@@ -47,6 +48,7 @@ describe('Burger Constructor Page Tests', () => {
       .contains(ingredientBun)
       .parent()
       .find('button')
+      .as('bunButton')
       .click();
 
     cy.get(selectorConstructorModule).should(
@@ -56,14 +58,15 @@ describe('Burger Constructor Page Tests', () => {
 
     // Add filling
     cy.get(selectorIngredientsModule)
-      .contains('Хрустящие минеральные кольца')
+      .contains(ingredientFilling)
       .parent()
       .find('button')
+      .as('fillingButton')
       .click();
 
     cy.get(selectorConstructorModule).should(
       'contain.text',
-      'Хрустящие минеральные кольца'
+      ingredientFilling
     );
   });
 
@@ -121,11 +124,14 @@ describe('Burger Constructor Page Tests', () => {
       .contains(ingredientBun)
       .parent()
       .find('button')
+      .as('bunButton')
       .click({ force: true });
+
     cy.get(selectorIngredientsModule)
-      .contains('Хрустящие минеральные кольца')
+      .contains(ingredientFilling)
       .parent()
       .find('button')
+      .as('fillingButton')
       .click({ force: true });
 
     // Place order
@@ -133,6 +139,7 @@ describe('Burger Constructor Page Tests', () => {
       .children()
       .last()
       .find('button')
+      .as('orderButton')
       .click({ force: true });
 
     // Verify order creation
