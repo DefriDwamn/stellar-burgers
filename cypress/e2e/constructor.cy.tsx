@@ -13,6 +13,11 @@ const NUTRITION_LABELS = {
   CARBOHYDRATES: 'Углеводы'
 };
 
+const PLACEHOLDER_TEXTS = {
+  SELECT_BUN: 'Выберите булки',
+  SELECT_FILLING: 'Выберите начинку'
+};
+
 describe('Burger Constructor Page Tests', () => {
   beforeEach(() => {
     cy.fixture('ingredients.json').as('ingredientsData');
@@ -145,11 +150,11 @@ describe('Burger Constructor Page Tests', () => {
     cy.get(selectorConstructorModule)
       .children()
       .first()
-      .should('contain.text', 'Выберите bun');
+      .should('contain.text', PLACEHOLDER_TEXTS.SELECT_BUN);
     cy.get(selectorConstructorModule)
       .children()
       .first()
       .next()
-      .should('contain.text', 'Выберите filling');
+      .should('contain.text', PLACEHOLDER_TEXTS.SELECT_FILLING);
   });
 });
