@@ -104,6 +104,7 @@ export const BurgerConstructorUI: FC<BurgerConstructorUIProps> = ({
           children='Оформить заказ'
           onClick={onOrderClick}
           disabled={orderRequest}
+          data-cy='order-button'
         />
       </div>
 

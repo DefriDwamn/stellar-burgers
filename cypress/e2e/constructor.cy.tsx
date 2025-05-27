@@ -4,6 +4,11 @@ const selectorConstructorModule = '[data-cy="constructor-module"]';
 const selectorModal = '[data-cy="modal"]';
 const selectorButtonCloseModal = '[data-cy="modal-close"]';
 const selectorOverlayModal = '[data-cy="modalOverlay"]';
+const selectorButton = 'button';
+const selectorOrderButton = '[data-cy="order-button"]';
+const selectorIngredientItem = '[data-cy="ingredient-item"]';
+
+// Names
 const ingredientBun = 'Флюоресцентная булка R2-D3';
 const ingredientFilling = 'Хрустящие минеральные кольца';
 
@@ -46,28 +51,22 @@ describe('Burger Constructor Page Tests', () => {
     // Add bun
     cy.get(selectorIngredientsModule)
       .contains(ingredientBun)
-      .parent()
-      .find('button')
+      .closest(selectorIngredientItem)
+      .find(selectorButton)
       .as('bunButton')
       .click();
 
-    cy.get(selectorConstructorModule).should(
-      'contain.text',
-      ingredientBun
-    );
+    cy.get(selectorConstructorModule).should('contain.text', ingredientBun);
 
     // Add filling
     cy.get(selectorIngredientsModule)
       .contains(ingredientFilling)
-      .parent()
-      .find('button')
+      .closest(selectorIngredientItem)
+      .find(selectorButton)
       .as('fillingButton')
       .click();
 
-    cy.get(selectorConstructorModule).should(
-      'contain.text',
-      ingredientFilling
-    );
+    cy.get(selectorConstructorModule).should('contain.text', ingredientFilling);
   });
 
   it('should open ingredient modal with correct data and close it via close button or overlay', function () {
@@ -80,7 +79,10 @@ describe('Burger Constructor Page Tests', () => {
       );
   
       // Open modal by click
-      cy.contains(ingredientBun).click();
+      cy.get(selectorIngredientsModule)
+        .contains(ingredientBun)
+        .closest(selectorIngredientItem)
+        .click();
       cy.get(selectorModal).should('be.visible');
   
       // Check if modal displays correct data
@@ -101,7 +103,10 @@ describe('Burger Constructor Page Tests', () => {
       cy.get(selectorModal).should('not.exist');
   
       // Open modal again
-      cy.contains(ingredientBun).click();
+      cy.get(selectorIngredientsModule)
+        .contains(ingredientBun)
+        .closest(selectorIngredientItem)
+        .click();
       cy.get(selectorModal).should('be.visible');
   
       // Close via overlay
@@ -122,25 +127,20 @@ describe('Burger Constructor Page Tests', () => {
     // Add ingredients to constructor
     cy.get(selectorIngredientsModule)
       .contains(ingredientBun)
-      .parent()
-      .find('button')
+      .closest(selectorIngredientItem)
+      .find(selectorButton)
       .as('bunButton')
       .click({ force: true });
 
     cy.get(selectorIngredientsModule)
       .contains(ingredientFilling)
-      .parent()
-      .find('button')
+      .closest(selectorIngredientItem)
+      .find(selectorButton)
       .as('fillingButton')
       .click({ force: true });
 
     // Place order
-    cy.get(selectorConstructorModule)
-      .children()
-      .last()
-      .find('button')
-      .as('orderButton')
-      .click({ force: true });
+    cy.get(selectorOrderButton).click({ force: true });
 
     // Verify order creation
     cy.wait('@postOrder').its('response.statusCode').should('eq', 200);
@@ -154,14 +154,7 @@ describe('Burger Constructor Page Tests', () => {
     cy.get(selectorModal).should('not.exist');
 
     // Verify constructor is cleared
-    cy.get(selectorConstructorModule)
-      .children()
-      .first()
-      .should('contain.text', PLACEHOLDER_TEXTS.SELECT_BUN);
-    cy.get(selectorConstructorModule)
-      .children()
-      .first()
-      .next()
-      .should('contain.text', PLACEHOLDER_TEXTS.SELECT_FILLING);
+    cy.get(selectorConstructorModule).should('contain.text', PLACEHOLDER_TEXTS.SELECT_BUN);
+    cy.get(selectorConstructorModule).should('contain.text', PLACEHOLDER_TEXTS.SELECT_FILLING);
   });
 });

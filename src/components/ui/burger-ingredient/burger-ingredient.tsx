@@ -15,7 +15,7 @@ export const BurgerIngredientUI: FC<TBurgerIngredientUIProps> = memo(
     const { image, price, name, _id } = ingredient;
 
     return (
-      <li className={styles.container}>
+      <li className={styles.container} data-cy='ingredient-item'>
         <Link
           className={styles.article}
           to={`/ingredients/${_id}`}
@@ -33,6 +33,7 @@ export const BurgerIngredientUI: FC<TBurgerIngredientUIProps> = memo(
           text='Добавить'
           onClick={handleAdd}
           extraClass={`${styles.addButton} mt-8`}
+          data-cy='ingredient-button'
         />
       </li>
     );
