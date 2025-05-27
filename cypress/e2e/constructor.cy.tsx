@@ -41,8 +41,8 @@ describe('Burger Constructor Page Tests', () => {
   });
 
   afterEach(() => {
-    localStorage.removeItem('refreshToken');
-    cy.clearCookie('accessToken');
+    cy.clearLocalStorage();
+    cy.clearCookies();
   });
 
   it('should add bun and filling to constructor when clicking add button', () => {
